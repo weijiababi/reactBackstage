@@ -1,105 +1,93 @@
 import React, { Component } from 'react'
-import { Table, Tag, Button } from 'antd'
+import { Tag, Button, Divider, Popconfirm, message } from 'antd'
+// eslint-disable-next-line
 import $post from '../../static/api/api.js'
+import MyTable from '../MyTable/MyTable'
 
 export class User extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      dataList: [],
-      columns: [
-        {
-          title: '用户名',
-          dataIndex: 'name',
-          key: 'name',
-          render: name => <a href="javascript:;">{name}</a>
-        },
-        {
-          title: '手机号',
-          dataIndex: 'phone',
-          key: 'phone'
-        },
-        {
-          title: '用户id',
-          dataIndex: 'user_id',
-          key: 'user_id',
-          render: id => <Tag color="blue">{id}</Tag>
-        },
-        {
-          title: '加入时间',
-          dataIndex: 'create_time',
-          key: 'create_time'
-        },
-        {
-          title: '操作',
-          key: 'action',
-          render: params => (
-            <span>
-              <Button
-                type="danger"
-                onClick={this.getDetail.bind(this, params.user_id)}
-              >
-                查询用户
-              </Button>
-            </span>
-          )
-        }
-      ],
-      loading: true,
-      currentPage: 1,
-      pagination: {}
-    }
+    this.state = {}
+    this.url = '/backend/user/finds'
+    this.row_key = 'user_id'
+    this.columns = [
+      {
+        title: '用户名',
+        dataIndex: 'name',
+        key: 'name',
+        render: name => <Tag>{name}</Tag>
+      },
+      {
+        title: '手机号',
+        dataIndex: 'phone',
+        key: 'phone'
+      },
+      {
+        title: '用户id',
+        dataIndex: 'user_id',
+        key: 'user_id',
+        render: id => <Tag>{id}</Tag>
+      },
+      {
+        title: '加入时间',
+        dataIndex: 'create_time',
+        key: 'create_time'
+      },
+      {
+        title: '操作',
+        key: 'action',
+        render: (text, params, index) => (
+          <span>
+            <Button
+              size="small"
+              onClick={this.delete.bind(this, params.user_id)}
+            >
+              删除
+            </Button>
+            <Divider type="vertical" />
+            <Popconfirm
+              title="是否将该用户设为管理员"
+              onConfirm={this.setAdmin.bind(this, text, params, index)}
+              okText="确认"
+              cancelText="取消"
+            >
+              <Button size="small">设为管理员</Button>
+            </Popconfirm>
+          </span>
+        ),
+        fixed: 'right',
+        width: 200
+      }
+    ]
+    this.searchColumn = [
+      {
+        key: 'phone',
+        type: 'input',
+        placeholder: '手机号'
+      }
+    ]
   }
-
-  componentWillMount() {
-    this.getData()
-  }
-
-  componentDidMount() {}
 
   render() {
-    const dataSource = this.state.dataList
-    const columns = this.state.columns
-    const loading = this.state.loading
-    const pagination = {
-      ...this.state.pagination,
-      onChange: this.pageChange.bind(this)
-    }
     return (
       <div className="User">
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          rowKey="user_id"
-          loading={loading}
-          pagination={pagination}
+        <MyTable
+          url={this.url}
+          row_key={this.row_key}
+          columns={this.columns}
+          searchColumn={this.searchColumn}
+          ref="myTable"
         />
       </div>
     )
   }
 
-  getData = (page = 1) => {
-    this.setState({
-      loading: true
-    })
-
-    $post('/user/finds', { page }).then(res => {
-      console.log(res)
-      this.setState({
-        dataList: res.data.data,
-        loading: false,
-        pagination: { ...this.state.pagination, total: res.data.total },
-        currentPage: res.data.current_page
-      })
-    })
+  delete = id => {
+    this.refs.myTable.delete(id, 'user_id', '/delete')
   }
 
-  getDetail = id => {
-    alert(id)
-  }
-
-  pageChange = newPage => {
-    this.getData(newPage)
+  setAdmin = (text, params, index) => {
+    message.success(`用户${params.user_id}已成功设置`)
   }
 }
 

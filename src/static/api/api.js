@@ -5,7 +5,7 @@ const config = {
 }
 
 function fetchPost(url, params = {}, method = 'POST', header = {}) {
-  url = config.baseUrl + '/backend' + url
+  url = config.baseUrl + url
   let newParams = {}
   if (method === 'GET' || method === 'get') {
     newParams = null
