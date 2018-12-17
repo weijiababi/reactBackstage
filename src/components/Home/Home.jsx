@@ -7,6 +7,7 @@ import User from '../User/User'
 import Saleman from '../Saleman/Saleman'
 import Product from '../Product/Product'
 import Address from '../Address/Address'
+import Admin from '../Admin/Admin'
 import './Home.scss'
 const { Header, Sider, Content } = Layout
 export class Home extends Component {
@@ -23,6 +24,11 @@ export class Home extends Component {
         name: 'saleman',
         icon: 'robot',
         link: '/home/saleman'
+      },
+      {
+        name: 'admin',
+        icon: 'thunderbolt',
+        link: '/home/admin'
       },
       {
         name: 'address',
@@ -45,7 +51,7 @@ export class Home extends Component {
 
   getCookie = () => {
     $post('/backend/manager/login', {
-      name: '黄智超',
+      name: '伟佳',
       password: '123456'
     }).then(res => {
       console.log(res)
@@ -54,6 +60,21 @@ export class Home extends Component {
         Cookie.set('session', res.data.session_id)
       }
     })
+  }
+
+  checkNav = () => {
+    this.state.navList.map((item, index) => {
+      if (item.link === window.location.pathname) {
+        this.setState({
+          selectItem: Array.of(String(index)) //Array.from({ length: 1 }, () => String(index))
+        })
+      }
+      return item.link === window.location.pathname
+    })
+  }
+
+  componentWillMount() {
+    this.checkNav()
   }
 
   render() {
@@ -80,20 +101,11 @@ export class Home extends Component {
           </Menu>
         </Sider>
         <Layout>
-          <Header
-            style={{
-              background: '#fff',
-              padding: 0,
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}
-          >
+          <Header>
             <Icon
-              className="trigger"
-              type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
+              type="menu-unfold"
               onClick={this.toggle}
+              className={this.state.collapsed ? 'trigger rotate' : 'trigger'}
             />
             <Avatar
               icon="user"
@@ -113,6 +125,7 @@ export class Home extends Component {
             <Switch>
               <Route path="/home/user" exact component={User} />
               <Route path="/home/saleman" exact component={Saleman} />
+              <Route path="/home/admin" exact component={Admin} />
               <Route path="/home/product" exact component={Product} />
               <Route path="/home/address" exact component={Address} />
               <Redirect exact from="/home" to="/home/user" />

@@ -38,10 +38,7 @@ export class User extends Component {
         key: 'action',
         render: (text, params, index) => (
           <span>
-            <Button
-              size="small"
-              onClick={this.delete.bind(this, params.user_id)}
-            >
+            <Button size="small" onClick={this.delete.bind(this, params)}>
               删除
             </Button>
             <Divider type="vertical" />
@@ -82,8 +79,11 @@ export class User extends Component {
     )
   }
 
-  delete = id => {
-    this.refs.myTable.delete(id, 'user_id', '/delete')
+  delete = params => {
+    let id = params.user_id
+    let key = 'user_id'
+    let url = '/delete'
+    this.refs.myTable.delete(id, key, url)
   }
 
   setAdmin = (text, params, index) => {

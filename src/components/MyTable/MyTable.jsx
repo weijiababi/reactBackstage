@@ -13,7 +13,8 @@ export class MyTable extends Component {
       url: '',
       params: {},
       searchColumn: [],
-      deleteIndex: -1
+      deleteIndex: -1,
+      deleteKey: ''
     }
   }
 
@@ -45,9 +46,10 @@ export class MyTable extends Component {
           dataSource={dataSource}
           loading={loading}
           rowKey={row_key}
+          size="small"
           pagination={pagination}
           rowClassName={(record, index) => {
-            return this.state.deleteIndex === record.user_id
+            return this.state.deleteIndex === record[this.state.deleteKey]
               ? 'animated zoomOutLeft'
               : 'animated fadeInRight'
           }}
@@ -101,29 +103,27 @@ export class MyTable extends Component {
         })
 
         self.setState({
-          deleteIndex: val
+          deleteIndex: val,
+          deleteKey: key
         })
 
         setTimeout(() => {
           self.setState({
             dataSource
           })
-        }, 800)
+        }, 750)
       }
     })
   }
 
-  update = (newVal, key, index, msg = '修改成功', url = '') => {
-    console.log(newVal)
-    console.log(key)
-    console.log(index)
-    message.success(msg)
-    console.log(url)
-
+  update = (key, index, msg = '修改成功', url = '') => {
     let dataSource = this.state.dataSource.map((item, order) => {
-      return order === index ? { ...item } : item
+      return order === index ? Object.assign(item, key) : item
     })
-    console.log(dataSource)
+    this.setState({
+      dataSource
+    })
+    message.success(msg)
   }
 }
 

@@ -44,7 +44,12 @@ export class Saleman extends Component {
         render: (text, params, index) => {
           return (
             <span>
-              <Button size="small">删除</Button>
+              <Button
+                size="small"
+                onClick={this.deleteSaleman.bind(this, params)}
+              >
+                删除
+              </Button>
             </span>
           )
         },
@@ -71,11 +76,18 @@ export class Saleman extends Component {
   }
 
   changeStatus(params, index) {
-    let status = params.stauts === 1 ? 2 : 1
-    let key = 'status'
+    let status = params.status === 1 ? 2 : 1
+    let key = { status }
     let msg = params.status === 1 ? '关闭成功' : '开启成功'
     let url = ''
-    this.refs.myTable.update(status, key, index, msg, url)
+    this.refs.myTable.update(key, index, msg, url)
+  }
+
+  deleteSaleman(params) {
+    let id = params.vocational_worker_id
+    let key = 'vocational_worker_id'
+    let url = '/delete'
+    this.refs.myTable.delete(id, key, url)
   }
 }
 
