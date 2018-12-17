@@ -48,7 +48,7 @@ export class MyTable extends Component {
           pagination={pagination}
           rowClassName={(record, index) => {
             return this.state.deleteIndex === record.user_id
-              ? 'animated zoomOutLeft min-black'
+              ? 'animated zoomOutLeft'
               : 'animated fadeInRight'
           }}
         />
