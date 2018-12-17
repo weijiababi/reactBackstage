@@ -88,7 +88,7 @@ export class MyTable extends Component {
     )
   }
 
-  delete = (val, key, url = {}) => {
+  delete = (val, key, url = '') => {
     let self = this
     Modal.confirm({
       title: '提示',
@@ -108,7 +108,7 @@ export class MyTable extends Component {
           self.setState({
             dataSource
           })
-        }, 600)
+        }, 800)
       }
     })
   }
