@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Table, Modal, message } from 'antd'
+import { Table, Modal, message, Input, Button } from 'antd'
 import $post from '../../static/api/api.js'
 import 'animate.css'
 import './MyTable.scss'
@@ -15,13 +15,18 @@ export class MyTable extends Component {
       params: {},
       searchColumn: [],
       deleteIndex: -1,
-      deleteKey: ''
+      deleteKey: '',
+      searchParams: {}
     }
+    this.currentKey = ''
   }
 
   componentWillMount() {
     //将props的值传入state
+    let searchParams = this.handleSearchColumn(this.props.searchColumn)
+
     this.setState({
+      searchParams,
       url: this.props.url ? this.props.url : '',
       params: this.props.params ? this.props.params : {},
       searchColumn: this.props.searchColumn ? this.props.searchColumn : []
@@ -32,15 +37,13 @@ export class MyTable extends Component {
   }
 
   render() {
-    const columns = this.props.columns
-    const row_key = this.props.row_key
-    const dataSource = this.state.dataSource
-    const loading = this.state.loading
+    const { columns, row_key } = this.props
+    const { dataSource, loading, searchColumn } = this.state
     const pagination = {
       ...this.state.pagination,
       onChange: this.pageChange.bind(this)
     }
-    const searchColumn = this.state.searchColumn
+
     const showControl = this.props.left || searchColumn.length
 
     return (
@@ -49,7 +52,7 @@ export class MyTable extends Component {
           <div className="control">
             <div className="control-left">{this.props.left}</div>
             <div className="control-right">
-              {searchColumn.length > 0 && <div>right</div>}
+              {searchColumn.length > 0 && <div>{this.renderSearch()}</div>}
             </div>
           </div>
         ) : null}
@@ -145,6 +148,43 @@ export class MyTable extends Component {
       dataSource
     })
     message.success(msg)
+  }
+
+  handleSearchColumn = columns => {
+    let params = {}
+    if (columns.length && columns.length > 0) {
+      columns.map((item, index) => {
+        params[item.key] = item.initialVal
+        return item.key
+      })
+    }
+    return params
+  }
+
+  handleInput = e => {
+    console.log(this.currentKey)
+    console.log(e.target.value)
+  }
+
+  renderSearch() {
+    const { searchColumn } = this.state
+    return (
+      <div className="search">
+        {searchColumn.map((item, index) => {
+          return (
+            <Input
+              type={item.type}
+              placeholder={item.placeholder}
+              key={index}
+              style={{ marginRight: '5px' }}
+              onChange={this.handleInput}
+              onFocus={(this.currentKey = item.key)}
+            />
+          )
+        })}
+        <Button type="primary">搜索</Button>
+      </div>
+    )
   }
 }
 

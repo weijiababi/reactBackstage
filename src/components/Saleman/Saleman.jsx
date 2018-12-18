@@ -92,6 +92,7 @@ export class Saleman extends Component {
           url={this.url}
           row_key={this.row_key}
           columns={this.columns}
+          searchColumn={[]}
           ref="myTable"
           left={this.addSalemanBtn()}
         />
@@ -161,6 +162,8 @@ export class Saleman extends Component {
       }
 
       console.log(values)
+      this.hideModal()
+      message.success('添加成功')
     })
   }
 

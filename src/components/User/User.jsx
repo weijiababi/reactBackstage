@@ -60,7 +60,8 @@ export class User extends Component {
       {
         key: 'phone',
         type: 'input',
-        placeholder: '手机号'
+        placeholder: '手机号',
+        initialVal: ''
       }
     ]
   }
