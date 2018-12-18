@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Table, Modal, message } from 'antd'
 import $post from '../../static/api/api.js'
 import 'animate.css'
+import './MyTable.scss'
 
 export class MyTable extends Component {
   constructor(props) {
@@ -19,6 +20,7 @@ export class MyTable extends Component {
   }
 
   componentWillMount() {
+    //将props的值传入state
     this.setState({
       url: this.props.url ? this.props.url : '',
       params: this.props.params ? this.props.params : {},
@@ -38,15 +40,24 @@ export class MyTable extends Component {
       ...this.state.pagination,
       onChange: this.pageChange.bind(this)
     }
+    const searchColumn = this.state.searchColumn
+    const showControl = this.props.left || searchColumn.length
 
     return (
       <div className="myTable">
+        {showControl ? (
+          <div className="control">
+            <div className="control-left">{this.props.left}</div>
+            <div className="control-right">
+              {searchColumn.length > 0 && <div>right</div>}
+            </div>
+          </div>
+        ) : null}
         <Table
           columns={columns}
           dataSource={dataSource}
           loading={loading}
           rowKey={row_key}
-          size="small"
           pagination={pagination}
           rowClassName={(record, index) => {
             return this.state.deleteIndex === record[this.state.deleteKey]
@@ -90,7 +101,8 @@ export class MyTable extends Component {
     )
   }
 
-  delete = (val, key, url = '') => {
+  delete = (val, key, postKey, url = '') => {
+    //被删除的值，被删除的key，需要做fetch的key， url
     let self = this
     Modal.confirm({
       title: '提示',
@@ -98,20 +110,29 @@ export class MyTable extends Component {
       okText: '确认',
       cancelText: '取消',
       onOk() {
-        const dataSource = self.state.dataSource.filter(item => {
-          return item[key] !== val
-        })
+        let params = {}
+        params[postKey] = Array.of(val)
+        $post(url, params).then(res => {
+          console.log(res)
+          if (res.code === 200) {
+            const dataSource = self.state.dataSource.filter(item => {
+              return item[key] !== val
+            })
 
-        self.setState({
-          deleteIndex: val,
-          deleteKey: key
-        })
+            self.setState({
+              deleteIndex: val,
+              deleteKey: key
+            })
 
-        setTimeout(() => {
-          self.setState({
-            dataSource
-          })
-        }, 750)
+            setTimeout(() => {
+              self.setState({
+                dataSource
+              })
+            }, 750)
+          } else {
+            message.warning(res.msg)
+          }
+        })
       }
     })
   }

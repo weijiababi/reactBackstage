@@ -119,7 +119,7 @@ export class Home extends Component {
               padding: 24,
               background: '#fff',
               minHeight: 280,
-              overflowY: 'scroll'
+              overflowY: 'auto'
             }}
           >
             <Switch>
