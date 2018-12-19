@@ -51,9 +51,7 @@ export class User extends Component {
               <Button size="small">设为管理员</Button>
             </Popconfirm>
           </span>
-        ),
-        fixed: 'right',
-        width: 200
+        )
       }
     ]
     this.searchColumn = [
