@@ -196,7 +196,7 @@ const CollectionCreateForm = Form.create()(
           onOk={onCreate}
         >
           <Form layout="vertical">
-            <FormItem label="姓名">
+            <FormItem label="姓名" style={{ marginBottom: 0 }}>
               {getFieldDecorator('name', {
                 rules: [
                   {
@@ -207,7 +207,7 @@ const CollectionCreateForm = Form.create()(
                 ]
               })(<Input />)}
             </FormItem>
-            <FormItem label="手机号">
+            <FormItem label="手机号" style={{ marginBottom: 0 }}>
               {getFieldDecorator('phone', {
                 rules: [
                   {
@@ -218,7 +218,7 @@ const CollectionCreateForm = Form.create()(
                 ]
               })(<Input />)}
             </FormItem>
-            <FormItem label="密码">
+            <FormItem label="密码" style={{ marginBottom: 0 }}>
               {getFieldDecorator('password', {
                 rules: [
                   {
