@@ -12,21 +12,20 @@ export class MyTable extends Component {
       loading: false,
       currentPage: 1,
       url: '',
-      params: {},
+      params: {}, //查询携带的默认参数
       searchColumn: [],
       deleteIndex: -1,
-      deleteKey: '',
-      searchParams: {}
+      deleteKey: ''
     }
     this.currentKey = ''
+    this.searchParams = {} //条件查询的参数
   }
 
   componentWillMount() {
     //将props的值传入state
-    let searchParams = this.handleSearchColumn(this.props.searchColumn)
+    this.searchParams = this.handleSearchColumn(this.props.searchColumn)
 
     this.setState({
-      searchParams,
       url: this.props.url ? this.props.url : '',
       params: this.props.params ? this.props.params : {},
       searchColumn: this.props.searchColumn ? this.props.searchColumn : []
@@ -74,12 +73,13 @@ export class MyTable extends Component {
 
   getData = () => {
     let url = this.state.url
-    let params = this.state.params
     let page = this.state.currentPage
+    let params = this.state.params
+    let searchParams = this.searchParams
     this.setState({
       loading: true
     })
-    $post(url, { ...params, page }).then(res => {
+    $post(url, { ...params, page, ...searchParams }).then(res => {
       console.log('获取第' + page + '页数据')
       console.log(res)
       if (res.code === 200) {
@@ -162,8 +162,25 @@ export class MyTable extends Component {
   }
 
   handleInput = e => {
-    console.log(this.currentKey)
-    console.log(e.target.value)
+    let searchParams = this.searchParams
+    let obj = {
+      [this.currentKey]: e.target.value
+    }
+    this.searchParams = { ...searchParams, ...obj }
+  }
+  handleFocus = key => {
+    this.currentKey = key
+  }
+  handleSearch = () => {
+    console.log(this.searchParams)
+    this.setState(
+      {
+        currentPage: 1
+      },
+      () => {
+        this.getData()
+      }
+    )
   }
 
   renderSearch() {
@@ -171,18 +188,23 @@ export class MyTable extends Component {
     return (
       <div className="search">
         {searchColumn.map((item, index) => {
-          return (
-            <Input
-              type={item.type}
-              placeholder={item.placeholder}
-              key={index}
-              style={{ marginRight: '5px' }}
-              onChange={this.handleInput}
-              onFocus={(this.currentKey = item.key)}
-            />
-          )
+          if (item.type === 'input') {
+            return (
+              <Input
+                type={item.type}
+                placeholder={item.placeholder}
+                key={index}
+                style={{ marginRight: '5px' }}
+                onChange={this.handleInput}
+                onFocus={this.handleFocus.bind(this, item.key)}
+              />
+            )
+          }
+          return item.type
         })}
-        <Button type="primary">搜索</Button>
+        <Button type="primary" onClick={this.handleSearch}>
+          搜索
+        </Button>
       </div>
     )
   }
