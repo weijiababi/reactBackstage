@@ -119,7 +119,8 @@ export class Home extends Component {
               padding: 24,
               background: '#fff',
               minHeight: 280,
-              overflowY: 'auto'
+              overflowY: 'auto',
+              overflowX: 'hidden'
             }}
           >
             <Switch>
