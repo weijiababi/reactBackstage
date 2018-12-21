@@ -141,13 +141,18 @@ export class MyTable extends Component {
   }
 
   update = (key, index, msg = '修改成功', url = '') => {
-    let dataSource = this.state.dataSource.map((item, order) => {
-      return order === index ? Object.assign(item, key) : item
+    $post(url, key).then(res => {
+      console.log(res)
+      if (res.code === 200) {
+        let dataSource = this.state.dataSource.map((item, order) => {
+          return order === index ? Object.assign(item, key) : item
+        })
+        this.setState({
+          dataSource
+        })
+        message.success(msg)
+      }
     })
-    this.setState({
-      dataSource
-    })
-    message.success(msg)
   }
 
   handleSearchColumn = columns => {

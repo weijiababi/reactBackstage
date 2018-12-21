@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import MyTable from '../MyTable/MyTable'
-import { Tag, Button, Switch, Divider, message, Modal, Form, Input } from 'antd'
+import { Button, Switch, Divider, message, Modal, Form, Input } from 'antd'
 import $post from '../../static/api/api.js'
 import Cookie from 'js-cookie'
 import './Saleman.scss'
@@ -19,14 +19,6 @@ export class Saleman extends Component {
         title: '姓名',
         key: 'name',
         dataIndex: 'name'
-      },
-      {
-        title: '昵称',
-        key: 'nickname',
-        dataIndex: 'nickname',
-        render: nickname => {
-          return nickname === '' ? '暂未设置' : <Tag>{nickname}</Tag>
-        }
       },
       {
         title: '邀请码',

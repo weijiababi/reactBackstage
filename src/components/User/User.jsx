@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Tag, Button, Divider, Popconfirm, message } from 'antd'
+import { Tag, Button, Divider, Popconfirm, message, Switch } from 'antd'
 // eslint-disable-next-line
 import $post from '../../static/api/api.js'
 import MyTable from '../MyTable/MyTable'
@@ -34,14 +34,22 @@ export class User extends Component {
         key: 'create_time'
       },
       {
+        title: '是否拉黑',
+        key: 'status',
+        render: (text, params, index) => {
+          return (
+            <Switch
+              defaultChecked={params.status === 1}
+              onChange={this.changeStatus.bind(this, params, index)}
+            />
+          )
+        }
+      },
+      {
         title: '操作',
         key: 'action',
         render: (text, params, index) => (
           <span>
-            <Button size="small" onClick={this.delete.bind(this, params)}>
-              删除
-            </Button>
-            <Divider type="vertical" />
             <Popconfirm
               title="是否将该用户设为管理员"
               onConfirm={this.setAdmin.bind(this, text, params, index)}
@@ -78,11 +86,13 @@ export class User extends Component {
     )
   }
 
-  delete = params => {
-    let id = params.user_id
-    let key = 'user_id'
-    let url = '/delete'
-    this.refs.myTable.delete(id, key, url)
+  changeStatus = (params, index) => {
+    let status = params.status === 1 ? 2 : 1
+    let { user_id } = params
+    let key = { status, user_id }
+    let msg = params.status === 1 ? '拉黑成功' : '解禁成功'
+    let url = '/backend/user/status'
+    this.refs.myTable.update(key, index, msg, url)
   }
 
   setAdmin = (text, params, index) => {
