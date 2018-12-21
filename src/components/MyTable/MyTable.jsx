@@ -36,7 +36,7 @@ export class MyTable extends Component {
   }
 
   render() {
-    const { columns, row_key } = this.props
+    const { columns, row_key, transition } = this.props
     const { dataSource, loading, searchColumn } = this.state
     const pagination = {
       ...this.state.pagination,
@@ -62,6 +62,10 @@ export class MyTable extends Component {
           rowKey={row_key}
           pagination={pagination}
           rowClassName={(record, index) => {
+            if (~~transition === 0) {
+              return
+            }
+
             return this.state.deleteIndex === record[this.state.deleteKey]
               ? 'animated zoomOutLeft'
               : 'animated fadeInRight'
@@ -157,7 +161,7 @@ export class MyTable extends Component {
 
   handleSearchColumn = columns => {
     let params = {}
-    if (columns.length && columns.length > 0) {
+    if (columns && columns.length > 0) {
       columns.map((item, index) => {
         params[item.key] = item.initialVal
         return item.key

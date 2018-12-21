@@ -1,5 +1,15 @@
 import React, { Component } from 'react'
-import { Tag, Button, Divider, Popconfirm, message, Switch } from 'antd'
+import {
+  Tag,
+  Button,
+  Divider,
+  Popconfirm,
+  message,
+  Switch,
+  Modal,
+  Input,
+  Icon
+} from 'antd'
 // eslint-disable-next-line
 import $post from '../../static/api/api.js'
 import MyTable from '../MyTable/MyTable'
@@ -7,7 +17,11 @@ import MyTable from '../MyTable/MyTable'
 export class User extends Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      rechargeVisible: false,
+      money: ''
+    }
+
     this.url = '/backend/user/finds'
     this.row_key = 'user_id'
     this.columns = [
@@ -58,21 +72,27 @@ export class User extends Component {
             >
               <Button size="small">设为管理员</Button>
             </Popconfirm>
+            <Divider type="vertical" />
+            <Button
+              type="primary"
+              onClick={this.handRecharge.bind(this, params)}
+            >
+              手动充值
+            </Button>
           </span>
         )
       }
     ]
     this.searchColumn = [
-      {
-        key: 'phone',
-        type: 'input',
-        placeholder: '手机号',
-        initialVal: ''
-      }
+      { key: 'phone', type: 'input', placeholder: '手机号', initialVal: '' }
     ]
+    this.user = {}
   }
 
   render() {
+    const { money } = this.state
+    const suffix =
+      money > 0 ? <Icon type="close-circle" onClick={this.emptyMoney} /> : null
     return (
       <div className="User">
         <MyTable
@@ -82,6 +102,21 @@ export class User extends Component {
           searchColumn={this.searchColumn}
           ref="myTable"
         />
+        <Modal
+          title="手工充值"
+          visible={this.state.rechargeVisible}
+          onCancel={this.hideRecharge}
+          onOk={this.confirmRecharge}
+        >
+          <Input
+            placeholder="请输入金额"
+            prefix={<Icon type="fire" />}
+            onChange={this.onChangeMoney}
+            style={{ marginTop: '10px' }}
+            value={money}
+            suffix={suffix}
+          />
+        </Modal>
       </div>
     )
   }
@@ -96,7 +131,56 @@ export class User extends Component {
   }
 
   setAdmin = (text, params, index) => {
-    message.success(`用户${params.user_id}已成功设置`)
+    message.success(`用户${params.user_id}已成功设置为管理员`)
+  }
+
+  hideRecharge = () => {
+    this.setState({
+      money: '',
+      rechargeVisible: false
+    })
+  }
+
+  handRecharge = user => {
+    this.user = user
+    this.setState({
+      rechargeVisible: true
+    })
+  }
+
+  onChangeMoney = e => {
+    this.setState({
+      money: e.target.value
+    })
+  }
+
+  emptyMoney = () => {
+    this.setState({
+      money: ''
+    })
+  }
+
+  confirmRecharge = () => {
+    let reg = /^[1-9][0-9]*$/
+    if (!reg.test(Number(this.state.money))) {
+      message.error('请输入正确金额')
+      this.hideRecharge()
+      return
+    }
+
+    $post('/backend/user_wallet/handRecharge', {
+      user_id: this.user.user_id,
+      balance: this.state.money
+    }).then(res => {
+      console.log('手工充值')
+      console.log(res)
+      if (res.code === 200) {
+        message.success('充值成功')
+      } else {
+        message.error('充值失败')
+      }
+      this.hideRecharge()
+    })
   }
 }
 

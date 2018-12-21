@@ -1,6 +1,15 @@
 import React, { Component } from 'react'
 import MyTable from '../MyTable/MyTable'
-import { Button, Switch, Divider, message, Modal, Form, Input } from 'antd'
+import {
+  Button,
+  Switch,
+  Divider,
+  message,
+  Modal,
+  Form,
+  Input,
+  Icon
+} from 'antd'
 import $post from '../../static/api/api.js'
 import Cookie from 'js-cookie'
 import './Saleman.scss'
@@ -10,8 +19,9 @@ export class Saleman extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      visible: false,
-      editVisible: false
+      addVisible: false,
+      editVisible: false,
+      clientVisible: false
     }
     this.url = '/backend/vocational_worker/finds'
     this.columns = [
@@ -43,6 +53,11 @@ export class Saleman extends Component {
         dataIndex: 'user_num'
       },
       {
+        title: '加入时间',
+        key: 'create_time',
+        dataIndex: 'create_time'
+      },
+      {
         title: '状态',
         key: 'status',
         render: (text, params, index) => {
@@ -55,11 +70,6 @@ export class Saleman extends Component {
         }
       },
       {
-        title: '加入时间',
-        key: 'create_time',
-        dataIndex: 'create_time'
-      },
-      {
         title: '备注',
         key: 'remark',
         dataIndex: 'remark'
@@ -69,17 +79,12 @@ export class Saleman extends Component {
         render: (text, params, index) => {
           return (
             <span>
-              <Button
-                type="primary"
-                size="small"
-                onClick={this.createQr.bind(this, params)}
-              >
+              <Button type="primary" onClick={this.createQr.bind(this, params)}>
                 生成二维码
               </Button>
               <Divider type="vertical" />
               <Button
                 type="primary"
-                size="small"
                 onClick={this.checkClient.bind(this, params)}
               >
                 查看客户
@@ -87,7 +92,6 @@ export class Saleman extends Component {
               <Divider type="vertical" />
               <Button
                 type="primary"
-                size="small"
                 onClick={this.editSaleman.bind(this, params)}
               >
                 编辑
@@ -99,7 +103,6 @@ export class Saleman extends Component {
                   backgroundColor: 'rgba(200,60,60,.9)',
                   border: 'none'
                 }}
-                size="small"
                 onClick={this.deleteSaleman.bind(this, params)}
               >
                 删除
@@ -109,6 +112,30 @@ export class Saleman extends Component {
         }
       }
     ]
+    this.client = {
+      url: '/backend/user/finds',
+      columns: [
+        { title: '姓名', key: 'name', dataIndex: 'name' },
+        { title: '联系方式', key: 'phone', dataIndex: 'phone' },
+        {
+          title: '类型',
+          key: 'type',
+          render: params => {
+            return (
+              <div>
+                {params.type === 2
+                  ? '银锤合伙人'
+                  : params.type === 3
+                  ? '金锤合伙人'
+                  : '未知'}
+              </div>
+            )
+          }
+        }
+      ],
+      row_key: 'name',
+      params: {}
+    }
     this.row_key = 'identifier'
     this.userData = {}
   }
@@ -122,14 +149,14 @@ export class Saleman extends Component {
           url={this.url}
           row_key={this.row_key}
           columns={this.columns}
-          searchColumn={[]}
           ref="myTable"
           left={this.addSalemanBtn()}
+          transition={true}
         />
         <CollectionCreateForm
           wrappedComponentRef={this.saveFormRef}
-          visible={this.state.visible}
-          onCancel={this.hideModal}
+          addVisible={this.state.addVisible}
+          onCancel={this.hideAdd}
           onCreate={this.handleCreate}
         />
         <EditCreateForm
@@ -139,6 +166,22 @@ export class Saleman extends Component {
           onEditCreate={this.onEditCreate}
           initData={this.userData}
         />
+        <Modal
+          title="客户表"
+          visible={this.state.clientVisible}
+          onOk={this.hideClient}
+          onCancel={this.hideClient}
+        >
+          {this.state.clientVisible && (
+            <MyTable
+              url={this.client.url}
+              row_key={this.client.row_key}
+              columns={this.client.columns}
+              params={this.client.params}
+              searchColumn={[]}
+            />
+          )}
+        </Modal>
       </div>
     )
   }
@@ -174,10 +217,22 @@ export class Saleman extends Component {
       }
     })
   }
+
   //查询客户
   checkClient = params => {
-    message.success('查询客户')
+    this.client.params = {
+      vocational_worker_id: params.vocational_worker_id
+    }
+    this.setState({
+      clientVisible: true
+    })
   }
+  hideClient = () => {
+    this.setState({
+      clientVisible: false
+    })
+  }
+  //查询客户
 
   //编辑合伙人
   editSaleman = params => {
@@ -223,14 +278,14 @@ export class Saleman extends Component {
   saveFormRef = formRef => {
     this.formRef = formRef
   }
-  showModal = () => {
+  showAdd = () => {
     this.setState({
-      visible: true
+      addVisible: true
     })
   }
-  hideModal = () => {
+  hideAdd = () => {
     this.setState({
-      visible: false
+      addVisible: false
     })
   }
   handleCreate = () => {
@@ -242,7 +297,7 @@ export class Saleman extends Component {
       }
 
       console.log(values)
-      this.hideModal()
+      this.hideAdd()
       message.success('添加成功')
     })
   }
@@ -252,8 +307,9 @@ export class Saleman extends Component {
   addSalemanBtn() {
     return (
       <div>
-        <Button type="primary" onClick={this.showModal}>
-          添加业务员
+        <Button type="primary" onClick={this.showAdd}>
+          <Icon type="plus" />
+          添加合伙人
         </Button>
       </div>
     )
@@ -266,12 +322,12 @@ const CollectionCreateForm = Form.create()(
   // eslint-disable-next-line
   class extends React.Component {
     render() {
-      const { visible, onCancel, onCreate, form } = this.props
+      const { addVisible, onCancel, onCreate, form } = this.props
       const { getFieldDecorator } = form
       return (
         <Modal
-          visible={visible}
-          title="添加业务员"
+          visible={addVisible}
+          title="添加合伙人"
           okText="确认"
           cancelText="取消"
           onCancel={onCancel}
@@ -295,7 +351,7 @@ const CollectionCreateForm = Form.create()(
                   {
                     required: true,
                     message: '请输入正确的手机号!',
-                    pattern: new RegExp(/^1[34578]\d{9}$/)
+                    pattern: new RegExp(/^1[3456789]\d{9}$/)
                   }
                 ]
               })(<Input />)}
@@ -359,7 +415,7 @@ const EditCreateForm = Form.create()(
                   {
                     required: true,
                     message: '请输入正确的手机号!',
-                    pattern: new RegExp(/^1[34578]\d{9}$/)
+                    pattern: new RegExp(/^1[3465789]\d{9}$/)
                   }
                 ],
                 initialValue: initData.phone
