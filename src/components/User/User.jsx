@@ -83,9 +83,7 @@ export class User extends Component {
         )
       }
     ]
-    this.searchColumn = [
-      { key: 'phone', type: 'input', placeholder: '手机号', initialVal: '' }
-    ]
+    this.searchColumn = [{ key: 'phone', placeholder: '手机号' }]
     this.user = {}
   }
 

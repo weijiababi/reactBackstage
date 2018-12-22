@@ -1,7 +1,7 @@
 .control {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 20px;
 }
@@ -9,4 +9,17 @@
 .search {
   display: flex;
   flex-direction: row;
+  align-items: flex-start;
+  .more {
+    margin-right: 5px;
+    color: #45a4fb;
+    cursor: pointer;
+    line-height: 32px;
+  }
+  .searchList {
+    width: 480px;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+  }
 }

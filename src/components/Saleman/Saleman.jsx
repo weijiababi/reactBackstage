@@ -8,8 +8,10 @@ import {
   Modal,
   Form,
   Input,
-  Icon
+  Icon,
+  Radio
 } from 'antd'
+
 import $post from '../../static/api/api.js'
 import Cookie from 'js-cookie'
 import './Saleman.scss'
@@ -136,6 +138,25 @@ export class Saleman extends Component {
       row_key: 'name',
       params: {}
     }
+    this.searchColumn = [
+      { key: 'phone', placeholder: '手机号' },
+      { key: 'name', placeholder: '姓名' },
+      { key: 'remark', placeholder: '备注', isMore: true },
+      { key: 'commerces_name', placeholder: '商务名字' },
+      {
+        type: 'select',
+        key: 'type',
+        placeholder: '请选择',
+        options: [{ value: 1, label: '银锤' }, { value: 2, label: '金锤' }],
+        isMore: true
+      },
+      {
+        type: 'datePicker',
+        key: 'date',
+        placeholder: '请选择日期',
+        isMore: true
+      }
+    ]
     this.row_key = 'identifier'
     this.userData = {}
   }
@@ -151,21 +172,27 @@ export class Saleman extends Component {
           columns={this.columns}
           ref="myTable"
           left={this.addSalemanBtn()}
+          searchColumn={this.searchColumn}
           transition={true}
         />
-        <CollectionCreateForm
-          wrappedComponentRef={this.saveFormRef}
-          addVisible={this.state.addVisible}
-          onCancel={this.hideAdd}
-          onCreate={this.handleCreate}
-        />
-        <EditCreateForm
-          wrappedComponentRef={this.saveEditFormRef}
-          editVisible={this.state.editVisible}
-          onEditCancel={this.onEditCancel}
-          onEditCreate={this.onEditCreate}
-          initData={this.userData}
-        />
+        {this.state.addVisible && (
+          <CollectionCreateForm
+            wrappedComponentRef={this.saveFormRef}
+            addVisible={this.state.addVisible}
+            onCancel={this.hideAdd}
+            onCreate={this.handleCreate}
+          />
+        )}
+        {this.state.editVisible && (
+          <EditCreateForm
+            wrappedComponentRef={this.saveEditFormRef}
+            editVisible={this.state.editVisible}
+            onEditCancel={this.onEditCancel}
+            onEditCreate={this.onEditCreate}
+            initData={this.userData}
+          />
+        )}
+
         <Modal
           title="客户表"
           visible={this.state.clientVisible}
@@ -343,7 +370,7 @@ const CollectionCreateForm = Form.create()(
                     type: 'string'
                   }
                 ]
-              })(<Input />)}
+              })(<Input placeholder="姓名" />)}
             </FormItem>
             <FormItem label="手机号" style={{ marginBottom: 0 }}>
               {getFieldDecorator('phone', {
@@ -354,20 +381,37 @@ const CollectionCreateForm = Form.create()(
                     pattern: new RegExp(/^1[3456789]\d{9}$/)
                   }
                 ]
-              })(<Input />)}
+              })(<Input placeholder="手机号" />)}
             </FormItem>
-            <FormItem label="密码" style={{ marginBottom: 0 }}>
-              {getFieldDecorator('password', {
+            <FormItem label="备注" style={{ marginBottom: 0 }}>
+              {getFieldDecorator('remark')(<Input placeholder="备注" />)}
+            </FormItem>
+            <FormItem label="昵称" style={{ marginBottom: 0 }}>
+              {getFieldDecorator('nickname')(<Input placeholder="昵称" />)}
+            </FormItem>
+            <FormItem label="邀请码" style={{ marginBottom: 0 }}>
+              {getFieldDecorator('invitation_code', {
                 rules: [
                   {
                     required: true,
-                    message: '请输入有效长度密码!',
-                    min: 6,
-                    max: 12
+                    message: '请输入正确长度的邀请码',
+                    pattern: new RegExp(/^\d{6}$/)
                   }
                 ]
-              })(<Input type="password" />)}
+              })(<Input placeholder="邀请码" />)}
             </FormItem>
+            <FormItem label="合伙人类型" style={{ marginBottom: 0 }}>
+              {getFieldDecorator('type', {
+                initialValue: '2',
+                rules: [{ required: true }]
+              })(
+                <Radio.Group>
+                  <Radio value="2">银锤合伙人</Radio>
+                  <Radio value="3">金锤合伙人</Radio>
+                </Radio.Group>
+              )}
+            </FormItem>
+            <FormItem label="商务负责人" style={{ marginBottom: 0 }} />
           </Form>
         </Modal>
       )

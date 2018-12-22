@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
-import { Table, Modal, message, Input, Button } from 'antd'
+import { Table, Modal, message, Input, Select, Button, DatePicker } from 'antd'
 import $post from '../../static/api/api.js'
 import 'animate.css'
 import './MyTable.scss'
+const Option = Select.Option
+//eslint-disable-next-line
+const { MonthPicker, RangePicker, WeekPicker } = DatePicker
 
 export class MyTable extends Component {
   constructor(props) {
@@ -15,7 +18,9 @@ export class MyTable extends Component {
       params: {}, //查询携带的默认参数
       searchColumn: [],
       deleteIndex: -1,
-      deleteKey: ''
+      deleteKey: '',
+      isMore: false, //是否出现更多的按钮
+      showMore: false //是否显示更多
     }
     this.currentKey = ''
     this.searchParams = {} //条件查询的参数
@@ -23,12 +28,14 @@ export class MyTable extends Component {
 
   componentWillMount() {
     //将props的值传入state
-    this.searchParams = this.handleSearchColumn(this.props.searchColumn)
+    this.searchParams = this.handleSearchParams(this.props.searchColumn)
 
     this.setState({
       url: this.props.url ? this.props.url : '',
       params: this.props.params ? this.props.params : {},
-      searchColumn: this.props.searchColumn ? this.props.searchColumn : []
+      searchColumn: this.props.searchColumn
+        ? this.handleSearchColumns(this.props.searchColumn)
+        : []
     })
   }
   componentDidMount() {
@@ -159,21 +166,55 @@ export class MyTable extends Component {
     })
   }
 
-  handleSearchColumn = columns => {
+  handleSearchParams = columns => {
     let params = {}
     if (columns && columns.length > 0) {
       columns.map((item, index) => {
-        params[item.key] = item.initialVal
+        params[item.key] = item.initialVal ? item.initialVal : ''
+
+        //判断是否需要出现更多
+        if (item.isMore) {
+          this.setState({
+            isMore: true
+          })
+        }
+
         return item.key
       })
     }
+
     return params
+  }
+
+  handleSearchColumns = columns => {
+    let arr1 = columns.filter(item => {
+      return !item.isMore
+    })
+    let arr2 = columns.filter(item => {
+      return item.isMore
+    })
+    let result = [...arr1, ...arr2]
+    return result
   }
 
   handleInput = e => {
     let searchParams = this.searchParams
     let obj = {
       [this.currentKey]: e.target.value
+    }
+    this.searchParams = { ...searchParams, ...obj }
+  }
+  handleSelect = e => {
+    let searchParams = this.searchParams
+    let obj = {
+      [this.currentKey]: e
+    }
+    this.searchParams = { ...searchParams, ...obj }
+  }
+  handleDatePick = (key, e, date) => {
+    let searchParams = this.searchParams
+    let obj = {
+      [key]: date
     }
     this.searchParams = { ...searchParams, ...obj }
   }
@@ -191,26 +232,69 @@ export class MyTable extends Component {
       }
     )
   }
+  canShowMore = () => {
+    this.setState({
+      showMore: !this.state.showMore
+    })
+  }
 
   renderSearch() {
-    const { searchColumn } = this.state
+    const { searchColumn, isMore, showMore } = this.state
     return (
       <div className="search">
-        {searchColumn.map((item, index) => {
-          if (item.type === 'input') {
-            return (
-              <Input
-                type={item.type}
-                placeholder={item.placeholder}
-                key={index}
-                style={{ marginRight: '5px' }}
-                onChange={this.handleInput}
-                onFocus={this.handleFocus.bind(this, item.key)}
-              />
-            )
-          }
-          return item.type
-        })}
+        {isMore && (
+          <div className="more" onClick={this.canShowMore}>
+            {showMore ? '收起' : '更多'}
+          </div>
+        )}
+        <div className="searchList">
+          {searchColumn.map((item, index) => {
+            if (!showMore && item.isMore) {
+              return false
+            }
+
+            if (!item.type) {
+              return (
+                <Input
+                  placeholder={item.placeholder}
+                  key={index}
+                  style={{ margin: '0 5px 5px 0', width: '150px' }}
+                  onChange={this.handleInput}
+                  onFocus={this.handleFocus.bind(this, item.key)}
+                />
+              )
+            } else if (item.type === 'select') {
+              return (
+                <Select
+                  placeholder={item.placeholder}
+                  key={index}
+                  onFocus={this.handleFocus.bind(this, item.key)}
+                  onChange={this.handleSelect}
+                  style={{ margin: '0 5px 5px 0', width: '150px' }}
+                >
+                  {item.options.map(option => {
+                    return (
+                      <Option value={option.value} key={option.value}>
+                        {option.label}
+                      </Option>
+                    )
+                  })}
+                </Select>
+              )
+            } else if (item.type === 'datePicker') {
+              return (
+                <DatePicker
+                  key={index}
+                  onChange={this.handleDatePick.bind(this, item.key)}
+                  placeholder={item.placeholder}
+                  style={{ margin: '0 5px 5px 0', width: '150px' }}
+                />
+              )
+            }
+
+            return item.key
+          })}
+        </div>
         <Button type="primary" onClick={this.handleSearch}>
           搜索
         </Button>
