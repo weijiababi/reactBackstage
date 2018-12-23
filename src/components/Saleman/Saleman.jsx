@@ -23,7 +23,11 @@ export class Saleman extends Component {
     this.state = {
       addVisible: false,
       editVisible: false,
-      clientVisible: false
+      clientVisible: false,
+      commercesVisible: false,
+      partnerVisible: false,
+      selectedCommerces: {},
+      selectedPartner: {}
     }
     this.url = '/backend/vocational_worker/finds'
     this.columns = [
@@ -114,6 +118,27 @@ export class Saleman extends Component {
         }
       }
     ]
+    this.searchColumn = [
+      { key: 'phone', placeholder: '手机号' },
+      { key: 'name', placeholder: '姓名' },
+      { key: 'remark', placeholder: '备注', isMore: true },
+      { key: 'commerces_name', placeholder: '商务名字' },
+      {
+        type: 'select',
+        key: 'type',
+        placeholder: '请选择',
+        options: [{ value: 1, label: '银锤' }, { value: 2, label: '金锤' }],
+        isMore: true
+      },
+      {
+        type: 'datePicker',
+        key: 'date',
+        placeholder: '请选择日期',
+        isMore: true
+      }
+    ]
+    this.row_key = 'identifier'
+    this.userData = {}
     this.client = {
       url: '/backend/user/finds',
       columns: [
@@ -138,27 +163,57 @@ export class Saleman extends Component {
       row_key: 'name',
       params: {}
     }
-    this.searchColumn = [
-      { key: 'phone', placeholder: '手机号' },
-      { key: 'name', placeholder: '姓名' },
-      { key: 'remark', placeholder: '备注', isMore: true },
-      { key: 'commerces_name', placeholder: '商务名字' },
-      {
-        type: 'select',
-        key: 'type',
-        placeholder: '请选择',
-        options: [{ value: 1, label: '银锤' }, { value: 2, label: '金锤' }],
-        isMore: true
-      },
-      {
-        type: 'datePicker',
-        key: 'date',
-        placeholder: '请选择日期',
-        isMore: true
-      }
-    ]
-    this.row_key = 'identifier'
-    this.userData = {}
+    this.commerces = {
+      url: '/backend/commerces/finds',
+      columns: [
+        { title: '姓名', key: 'name', dataIndex: 'name' },
+        { title: '手机号', key: 'phone', dataIndex: 'phone' },
+        { title: '备注', key: 'remark', dataIndex: 'remark' },
+        {
+          title: '操作',
+          key: 'action',
+          render: params => {
+            return (
+              <Button
+                type="primary"
+                onClick={this.selectCommerces.bind(this, params)}
+              >
+                选择
+              </Button>
+            )
+          }
+        }
+      ],
+      row_key: 'commerces_id',
+      searchColumn: [{ key: 'name', placeholder: '商务人员名字' }]
+    }
+    this.partner = {
+      url: '/backend/vocational_worker/chooseVocationalWorker',
+      columns: [
+        { title: '姓名', key: 'name', dataIndex: 'name' },
+        { title: '手机号', key: 'phone', dataIndex: 'phone' },
+        { title: '备注', key: 'remark', dataIndex: 'remark' },
+        {
+          title: '操作',
+          key: 'action',
+          render: params => {
+            return (
+              <Button
+                type="primary"
+                onClick={this.selectPartner.bind(this, params)}
+              >
+                选择
+              </Button>
+            )
+          }
+        }
+      ],
+      row_key: 'name',
+      searchColumn: [
+        { key: 'name', placeholder: '姓名' },
+        { key: 'phone', placeholder: '手机号' }
+      ]
+    }
   }
 
   componentDidMount() {}
@@ -175,39 +230,72 @@ export class Saleman extends Component {
           searchColumn={this.searchColumn}
           transition={true}
         />
-        {this.state.addVisible && (
-          <CollectionCreateForm
-            wrappedComponentRef={this.saveFormRef}
-            addVisible={this.state.addVisible}
-            onCancel={this.hideAdd}
-            onCreate={this.handleCreate}
-          />
-        )}
-        {this.state.editVisible && (
-          <EditCreateForm
-            wrappedComponentRef={this.saveEditFormRef}
-            editVisible={this.state.editVisible}
-            onEditCancel={this.onEditCancel}
-            onEditCreate={this.onEditCreate}
-            initData={this.userData}
-          />
-        )}
+
+        <CollectionCreateForm
+          wrappedComponentRef={this.saveFormRef}
+          addVisible={this.state.addVisible}
+          onCancel={this.hideAdd}
+          onCreate={this.handleCreate}
+          showCommerces={this.showCommerces}
+          showPartner={this.showPartner}
+          commerces={this.state.selectedCommerces}
+          partner={this.state.selectedPartner}
+        />
+
+        <EditCreateForm
+          wrappedComponentRef={this.saveEditFormRef}
+          editVisible={this.state.editVisible}
+          onEditCancel={this.onEditCancel}
+          onEditCreate={this.onEditCreate}
+          initData={this.userData}
+        />
 
         <Modal
           title="客户表"
           visible={this.state.clientVisible}
           onOk={this.hideClient}
           onCancel={this.hideClient}
+          destroyOnClose={true}
         >
-          {this.state.clientVisible && (
-            <MyTable
-              url={this.client.url}
-              row_key={this.client.row_key}
-              columns={this.client.columns}
-              params={this.client.params}
-              searchColumn={[]}
-            />
-          )}
+          <MyTable
+            url={this.client.url}
+            row_key={this.client.row_key}
+            columns={this.client.columns}
+            params={this.client.params}
+            searchColumn={[]}
+          />
+        </Modal>
+
+        <Modal
+          title="选择商务负责人"
+          visible={this.state.commercesVisible}
+          onOk={this.hideCommerces}
+          onCancel={this.hideCommerces}
+          width={600}
+          destroyOnClose={true}
+        >
+          <MyTable
+            url={this.commerces.url}
+            row_key={this.commerces.row_key}
+            columns={this.commerces.columns}
+            searchColumn={this.commerces.searchColumn}
+          />
+        </Modal>
+
+        <Modal
+          title="选择合伙人"
+          visible={this.state.partnerVisible}
+          onOk={this.hidePartner}
+          onCancel={this.hidePartner}
+          width={600}
+          destroyOnClose={true}
+        >
+          <MyTable
+            url={this.partner.url}
+            row_key={this.partner.row_key}
+            columns={this.partner.columns}
+            searchColumn={this.partner.searchColumn}
+          />
         </Modal>
       </div>
     )
@@ -312,6 +400,8 @@ export class Saleman extends Component {
   }
   hideAdd = () => {
     this.setState({
+      selectedCommerces: {},
+      selectedPartner: {},
       addVisible: false
     })
   }
@@ -323,12 +413,56 @@ export class Saleman extends Component {
         return
       }
 
-      console.log(values)
+      let params = {
+        ...values,
+        commerces_id:
+          JSON.stringify(this.state.selectedCommerces.commerces_id) !== '{}'
+            ? this.state.selectedCommerces.commerces_id
+            : '',
+        p_id:
+          JSON.stringify(this.state.selectedPartner) !== '{}'
+            ? this.state.selectedPartner.vocational_worker_id
+            : ''
+      }
+      console.log(params)
       this.hideAdd()
       message.success('添加成功')
     })
   }
   //新建合伙人
+
+  showCommerces = () => {
+    this.setState({
+      commercesVisible: true
+    })
+  }
+  hideCommerces = () => {
+    this.setState({
+      commercesVisible: false
+    })
+  }
+  selectCommerces = obj => {
+    this.setState({
+      selectedCommerces: obj
+    })
+    this.hideCommerces()
+  }
+  showPartner = () => {
+    this.setState({
+      partnerVisible: true
+    })
+  }
+  hidePartner = () => {
+    this.setState({
+      partnerVisible: false
+    })
+  }
+  selectPartner = obj => {
+    this.setState({
+      selectedPartner: obj
+    })
+    this.hidePartner()
+  }
 
   //新建合伙人按钮
   addSalemanBtn() {
@@ -349,7 +483,16 @@ const CollectionCreateForm = Form.create()(
   // eslint-disable-next-line
   class extends React.Component {
     render() {
-      const { addVisible, onCancel, onCreate, form } = this.props
+      const {
+        addVisible,
+        onCancel,
+        onCreate,
+        form,
+        showCommerces,
+        showPartner,
+        commerces,
+        partner
+      } = this.props
       const { getFieldDecorator } = form
       return (
         <Modal
@@ -359,6 +502,7 @@ const CollectionCreateForm = Form.create()(
           cancelText="取消"
           onCancel={onCancel}
           onOk={onCreate}
+          destroyOnClose={true}
         >
           <Form layout="vertical">
             <FormItem label="姓名" style={{ marginBottom: 0 }}>
@@ -411,7 +555,50 @@ const CollectionCreateForm = Form.create()(
                 </Radio.Group>
               )}
             </FormItem>
-            <FormItem label="商务负责人" style={{ marginBottom: 0 }} />
+            <FormItem label="商务负责人" style={{ marginBottom: 0 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center'
+                }}
+              >
+                <Button
+                  type="primary"
+                  onClick={showCommerces}
+                  style={{ marginRight: '5px' }}
+                >
+                  选择负责人
+                </Button>
+                <span>
+                  {JSON.stringify(commerces) !== '{}' ? (
+                    <div>已选择: {commerces.name}</div>
+                  ) : null}
+                </span>
+              </div>
+            </FormItem>
+            <FormItem label="合伙人" style={{ marginBottom: 0 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center'
+                }}
+              >
+                <Button
+                  type="primary"
+                  onClick={showPartner}
+                  style={{ marginRight: '5px' }}
+                >
+                  选择合伙人
+                </Button>
+                <span>
+                  {JSON.stringify(partner) !== '{}' ? (
+                    <div>已选择: {partner.name}</div>
+                  ) : null}
+                </span>
+              </div>
+            </FormItem>
           </Form>
         </Modal>
       )
@@ -439,6 +626,7 @@ const EditCreateForm = Form.create()(
           cancelText="取消"
           onCancel={onEditCancel}
           onOk={onEditCreate}
+          destroyOnClose={true}
         >
           <Form layout="vertical">
             <FormItem label="姓名" style={{ marginBottom: 0 }}>
