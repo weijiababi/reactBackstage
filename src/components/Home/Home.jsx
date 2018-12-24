@@ -16,14 +16,22 @@ export class Home extends Component {
     selectItem: ['0'],
     navList: [
       {
+        name: 'saleman',
+        title: '<p>title</p>',
+        sub: true,
+        key: 'saleman',
+        children: [
+          {
+            name: 'saleman',
+            icon: 'robot',
+            link: '/home/saleman'
+          }
+        ]
+      },
+      {
         name: 'user',
         icon: 'user',
         link: '/home/user'
-      },
-      {
-        name: 'saleman',
-        icon: 'robot',
-        link: '/home/saleman'
       },
       {
         name: 'admin',
@@ -64,12 +72,31 @@ export class Home extends Component {
 
   checkNav = () => {
     this.state.navList.map((item, index) => {
-      if (item.link === window.location.pathname) {
-        this.setState({
-          selectItem: Array.of(String(index)) //Array.from({ length: 1 }, () => String(index))
+      if (!item.sub) {
+        if (item.link === window.location.pathname) {
+          this.setState({
+            selectItem: Array.of(String(index)) //Array.from({ length: 1 }, () => String(index))
+          })
+        }
+      } else {
+        item.children.map((child, index1) => {
+          if (child.link === window.location.pathname) {
+            this.setState({
+              selectItem: Array.of(String(`${item.key}-${index1}`))
+            })
+          }
+          return child.name
         })
       }
-      return item.link === window.location.pathname
+      return item.link
+    })
+  }
+
+  subMenuTitle(title) {
+    return React.createElement('div', {
+      dangerouslySetInnerHTML: {
+        __html: title
+      }
     })
   }
 
@@ -89,14 +116,35 @@ export class Home extends Component {
             defaultSelectedKeys={this.state.selectItem}
           >
             {navList.map((item, index) => {
-              return (
-                <Menu.Item key={index}>
-                  <Link to={item.link}>
-                    <Icon type={item.icon} />
-                    <span>{item.name}</span>
-                  </Link>
-                </Menu.Item>
-              )
+              if (!item.sub) {
+                return (
+                  <Menu.Item key={index}>
+                    <Link to={item.link}>
+                      <Icon type={item.icon} />
+                      <span>{item.name}</span>
+                    </Link>
+                  </Menu.Item>
+                )
+              } else if (item.sub) {
+                return (
+                  <Menu.SubMenu
+                    key={item.key}
+                    title={this.subMenuTitle(item.title)}
+                  >
+                    {item.children.map((child, index1) => {
+                      return (
+                        <Menu.Item key={`${item.key}-${index1}`}>
+                          <Link to={child.link}>
+                            <Icon type={child.icon} />
+                            <span>{child.name}</span>
+                          </Link>
+                        </Menu.Item>
+                      )
+                    })}
+                  </Menu.SubMenu>
+                )
+              }
+              return item.name
             })}
           </Menu>
         </Sider>
