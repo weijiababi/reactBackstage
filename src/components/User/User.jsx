@@ -99,6 +99,7 @@ export class User extends Component {
           columns={this.columns}
           searchColumn={this.searchColumn}
           ref="myTable"
+          transition={true}
         />
         <Modal
           title="手工充值"
