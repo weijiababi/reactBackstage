@@ -17,7 +17,7 @@ export class Home extends Component {
     navList: [
       {
         name: 'saleman',
-        title: '<p>title</p>',
+        title: '<p>cooperator</p>',
         sub: true,
         key: 'saleman',
         children: [
