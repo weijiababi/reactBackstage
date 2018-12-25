@@ -10,6 +10,7 @@ export class ArticlePublish extends Component {
       <div className="articlePublice">
         <Editor
           initialValue="<p>This is the initial content of the editor</p>"
+          apiKey='iekxjcaq7i59luf3of5fdmxbwkot94dzkun3ngmg30qbmg48'
           init={{
             plugins: 'link image code',
             toolbar:
