@@ -7,6 +7,7 @@ import User from '../User/User'
 import Saleman from '../Saleman/Saleman'
 import Product from '../Product/Product'
 import Address from '../Address/Address'
+import articlePublish from '../Article/ArticlePublish/ArticlePublish'
 import Admin from '../Admin/Admin'
 import './Home.scss'
 const { Header, Sider, Content } = Layout
@@ -25,6 +26,19 @@ export class Home extends Component {
             name: 'saleman',
             icon: 'robot',
             link: '/home/saleman'
+          }
+        ]
+      },
+      {
+        name: 'article',
+        title: '<p>article</p>',
+        sub: true,
+        key: 'article',
+        children: [
+          {
+            name: 'articlePublish',
+            icon: 'file-text',
+            link: '/home/articlePublish'
           }
         ]
       },
@@ -177,6 +191,11 @@ export class Home extends Component {
               <Route path="/home/admin" exact component={Admin} />
               <Route path="/home/product" exact component={Product} />
               <Route path="/home/address" exact component={Address} />
+              <Route
+                path="/home/articlePublish"
+                exact
+                component={articlePublish}
+              />
               <Redirect exact from="/home" to="/home/user" />
             </Switch>
           </Content>
