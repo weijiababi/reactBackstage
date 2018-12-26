@@ -18,26 +18,26 @@ export class Home extends Component {
     navList: [
       {
         name: 'saleman',
-        title: '<p>cooperator</p>',
+        title: 'cooperator',
+        icon: 'team',
         sub: true,
         key: 'saleman',
         children: [
           {
             name: 'saleman',
-            icon: 'robot',
             link: '/home/saleman'
           }
         ]
       },
       {
         name: 'article',
-        title: '<p>article</p>',
+        title: 'article',
+        icon: 'file-text',
         sub: true,
         key: 'article',
         children: [
           {
             name: 'articlePublish',
-            icon: 'file-text',
             link: '/home/articlePublish'
           }
         ]
@@ -143,13 +143,22 @@ export class Home extends Component {
                 return (
                   <Menu.SubMenu
                     key={item.key}
-                    title={this.subMenuTitle(item.title)}
+                    title={
+                      item.icon ? (
+                        <span>
+                          <Icon type={item.icon} />
+                          <span>{item.title}</span>
+                        </span>
+                      ) : (
+                        <span>{item.title}</span>
+                      )
+                    }
                   >
                     {item.children.map((child, index1) => {
                       return (
                         <Menu.Item key={`${item.key}-${index1}`}>
                           <Link to={child.link}>
-                            <Icon type={child.icon} />
+                            {child.icon ? <Icon type={child.icon} /> : null}
                             <span>{child.name}</span>
                           </Link>
                         </Menu.Item>
