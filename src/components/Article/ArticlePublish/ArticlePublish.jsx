@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { message } from 'antd'
+import { message, Form, Button, Input, Checkbox } from 'antd'
 import Cookie from 'js-cookie'
 import E from 'wangeditor'
 
@@ -22,7 +22,6 @@ export class ArticlePublish extends Component {
       'http://gc.moscales.com/backend/article/upload'
     editor.customConfig.uploadImgMaxLength = 1
     editor.customConfig.customUploadImg = (files, insert) => {
-      console.log(files)
       if (files[0]) {
         const formData = new window.FormData()
         formData.append('files', files[0], 'cover.jpg') //分别为表单名称，表单值以及文件名
@@ -106,14 +105,22 @@ export class ArticlePublish extends Component {
   render() {
     return (
       <div className="articlePublice">
-        <div ref="editorElem">
-          <p>
-            欢迎使用 <b>wangEditor</b> 富文本编辑器
-          </p>
-        </div>
+        <div ref="editorElem" />
       </div>
     )
   }
 }
 
 export default ArticlePublish
+
+const FormWrapper = Form.create()(
+  class extends React.Component {
+    state = {
+      title: '',
+      intro: '',
+      key: '',
+      type: '0',
+      img: ''
+    }
+  }
+)

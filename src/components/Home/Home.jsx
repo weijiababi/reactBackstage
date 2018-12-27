@@ -26,6 +26,10 @@ export class Home extends Component {
           {
             name: 'saleman',
             link: '/home/saleman'
+          },
+          {
+            name: 'user',
+            link: 'user'
           }
         ]
       },
@@ -41,11 +45,6 @@ export class Home extends Component {
             link: '/home/articlePublish'
           }
         ]
-      },
-      {
-        name: 'user',
-        icon: 'user',
-        link: '/home/user'
       },
       {
         name: 'admin',

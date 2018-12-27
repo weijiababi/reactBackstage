@@ -98,7 +98,11 @@ export class MyTable extends Component {
           dataSource: res.data.data,
           loading: false,
           currentPage: res.data.current_page > 0 ? res.data.current_page : 1,
-          pagination: { ...this.state.pagination, total: res.data.total }
+          pagination: {
+            ...this.state.pagination,
+            total: res.data.total,
+            current: res.data.current_page > 0 ? res.data.current_page : 1
+          }
         })
       }
     })
@@ -237,6 +241,23 @@ export class MyTable extends Component {
       showMore: !this.state.showMore
     })
   }
+  handleReset = () => {
+    let searchColumn = this.state.searchColumn //缓存searchColumn
+    this.searchParams = {}
+    this.setState(
+      {
+        showMore: false,
+        currentPage: 1,
+        searchColumn: []
+      },
+      () => {
+        this.setState({
+          searchColumn
+        })
+        this.getData()
+      }
+    )
+  }
 
   renderSearch() {
     const { searchColumn, isMore, showMore } = this.state
@@ -295,8 +316,12 @@ export class MyTable extends Component {
             return item.key
           })}
         </div>
+
         <Button type="primary" onClick={this.handleSearch}>
           搜索
+        </Button>
+        <Button style={{ marginLeft: '5px' }} onClick={this.handleReset}>
+          重置
         </Button>
       </div>
     )
