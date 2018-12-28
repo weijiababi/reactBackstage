@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { message, Form, Button, Input, Checkbox } from 'antd'
+import { message, Form, Button, Input, Radio } from 'antd'
 import Cookie from 'js-cookie'
 import E from 'wangeditor'
 
@@ -105,6 +105,7 @@ export class ArticlePublish extends Component {
   render() {
     return (
       <div className="articlePublice">
+        <FormWrapper />
         <div ref="editorElem" />
       </div>
     )
@@ -121,6 +122,64 @@ const FormWrapper = Form.create()(
       key: '',
       type: '0',
       img: ''
+    }
+    render() {
+      const { getFieldDecorator } = this.props.form
+      const formItemLayout = {
+        labelCol: { span: 1 },
+        wrapperCol: { span: 6 }
+      }
+      const formTailLayout = {
+        labelCol: { span: 4 },
+        wrapperCol: { span: 8, offset: 4 }
+      }
+      return (
+        <div>
+          <Form.Item
+            {...formItemLayout}
+            label="title"
+            style={{ marginBottom: '4px' }}
+          >
+            {getFieldDecorator('title', {
+              rules: [
+                {
+                  required: true,
+                  message: 'please input the title'
+                }
+              ]
+            })(<Input placeholder="please input the title" />)}
+          </Form.Item>
+          <Form.Item
+            {...formItemLayout}
+            label="intro"
+            style={{ marginBottom: '4px' }}
+          >
+            {getFieldDecorator('intro', {
+              rules: [
+                {
+                  required: true,
+                  message: 'please input the intro'
+                }
+              ]
+            })(<Input placeholder="please input the intro" />)}
+          </Form.Item>
+          <Form.Item
+            {...formItemLayout}
+            label="type"
+            style={{ marginBottom: '4px' }}
+          >
+            {getFieldDecorator('type', {
+              initialValue: '1'
+            })(
+              <Radio.Group>
+                <Radio value="1">normal</Radio>
+                <Radio value="2">learn</Radio>
+                <Radio value="3">help</Radio>
+              </Radio.Group>
+            )}
+          </Form.Item>
+        </div>
+      )
     }
   }
 )

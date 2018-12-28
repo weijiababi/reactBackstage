@@ -29,7 +29,7 @@ export class Home extends Component {
           },
           {
             name: 'user',
-            link: 'user'
+            link: '/home/user'
           }
         ]
       },
