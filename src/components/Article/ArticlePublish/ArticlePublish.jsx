@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { message, Form, Button, Input, Radio } from 'antd'
+//eslint-disable-next-line
+import { message, Form, Button, Input, Radio, Icon, Upload, Modal } from 'antd'
 import Cookie from 'js-cookie'
 import E from 'wangeditor'
 
@@ -7,7 +8,18 @@ export class ArticlePublish extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      content: ''
+      content: '',
+      previewVisible: false,
+      previewImage: '',
+      fileList: [
+        {
+          uid: '-1',
+          name: 'xxx.png',
+          status: 'done',
+          url:
+            'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+        }
+      ]
     }
   }
   componentDidMount() {
@@ -102,11 +114,62 @@ export class ArticlePublish extends Component {
     //追加内容this.editor.txt.append('<p>追加的内容</p>')
     //清除内容this.editor.txt.clear()
   }
+
+  handlePreview = file => {
+    this.setState({
+      previewImage: file.url || file.thumbUrl,
+      previewVisible: true
+    })
+  }
+
+  handleChange = ({ fileList }) => {
+    console.log(fileList)
+    this.setState({
+      fileList
+    })
+  }
+
+  handleCancel = () => {
+    this.setState({
+      previewVisible: false
+    })
+  }
+
   render() {
+    const { previewVisible, previewImage, fileList } = this.state
+    const data = {
+      session_id: Cookie.get('session')
+    }
+    const uploadButton = (
+      <div>
+        <Icon type="plus" />
+        <div className="ant-upload-text">Upload</div>
+      </div>
+    )
     return (
       <div className="articlePublice">
         <FormWrapper />
+        <div className="clearfix" style={{ marginBottom: '20px' }}>
+          <Upload
+            action="https://gc.moscales.com/backend/article/upload"
+            listType="picture-card"
+            fileList={fileList}
+            onPreview={this.handlePreview}
+            onChange={this.handleChange}
+            name={'files'}
+            data={data}
+          >
+            {fileList.length >= 3 ? null : uploadButton}
+          </Upload>
+        </div>
         <div ref="editorElem" />
+        <Modal
+          visible={previewVisible}
+          footer={null}
+          onCancel={this.handleCancel}
+        >
+          <img alt="example" style={{ width: '100%' }} src={previewImage} />
+        </Modal>
       </div>
     )
   }
@@ -129,16 +192,12 @@ const FormWrapper = Form.create()(
         labelCol: { span: 1 },
         wrapperCol: { span: 6 }
       }
-      const formTailLayout = {
-        labelCol: { span: 4 },
-        wrapperCol: { span: 8, offset: 4 }
-      }
       return (
         <div>
           <Form.Item
             {...formItemLayout}
             label="title"
-            style={{ marginBottom: '4px' }}
+            style={{ marginBottom: '8px' }}
           >
             {getFieldDecorator('title', {
               rules: [
@@ -152,7 +211,7 @@ const FormWrapper = Form.create()(
           <Form.Item
             {...formItemLayout}
             label="intro"
-            style={{ marginBottom: '4px' }}
+            style={{ marginBottom: '8px' }}
           >
             {getFieldDecorator('intro', {
               rules: [
@@ -166,7 +225,7 @@ const FormWrapper = Form.create()(
           <Form.Item
             {...formItemLayout}
             label="type"
-            style={{ marginBottom: '4px' }}
+            style={{ marginBottom: '8px' }}
           >
             {getFieldDecorator('type', {
               initialValue: '1'

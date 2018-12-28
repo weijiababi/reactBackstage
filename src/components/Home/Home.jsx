@@ -5,10 +5,11 @@ import Cookie from 'js-cookie'
 import $post from '../../static/api/api.js'
 import User from '../User/User'
 import Saleman from '../Saleman/Saleman'
-import Product from '../Product/Product'
-import Address from '../Address/Address'
 import articlePublish from '../Article/ArticlePublish/ArticlePublish'
 import Admin from '../Admin/Admin'
+import Line from '../chart/line/line'
+import Bar from '../chart/bar/bar'
+import Pie from '../chart/pie/pie'
 import './Home.scss'
 const { Header, Sider, Content } = Layout
 export class Home extends Component {
@@ -30,6 +31,10 @@ export class Home extends Component {
           {
             name: 'user',
             link: '/home/user'
+          },
+          {
+            name: 'admin',
+            link: '/home/admin'
           }
         ]
       },
@@ -47,19 +52,16 @@ export class Home extends Component {
         ]
       },
       {
-        name: 'admin',
-        icon: 'thunderbolt',
-        link: '/home/admin'
-      },
-      {
-        name: 'address',
-        icon: 'video-camera',
-        link: '/home/address'
-      },
-      {
-        name: 'product',
-        icon: 'upload',
-        link: '/home/product'
+        name: 'chart',
+        icon: 'stock',
+        title: 'chart',
+        sub: true,
+        key: 'chart',
+        children: [
+          { name: 'line', link: '/home/chart/line' },
+          { name: 'bar', link: '/home/chart/bar' },
+          { name: 'pie', link: '/home/chart/pie' }
+        ]
       }
     ]
   }
@@ -197,13 +199,14 @@ export class Home extends Component {
               <Route path="/home/user" exact component={User} />
               <Route path="/home/saleman" exact component={Saleman} />
               <Route path="/home/admin" exact component={Admin} />
-              <Route path="/home/product" exact component={Product} />
-              <Route path="/home/address" exact component={Address} />
               <Route
                 path="/home/articlePublish"
                 exact
                 component={articlePublish}
               />
+              <Route path="/home/chart/line" exact component={Line} />
+              <Route path="/home/chart/bar" exact component={Bar} />
+              <Route path="/home/chart/pie" exact component={Pie} />
               <Redirect exact from="/home" to="/home/user" />
             </Switch>
           </Content>

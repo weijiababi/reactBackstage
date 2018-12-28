@@ -1,7 +1,7 @@
 import Cookie from 'js-cookie'
 
 const config = {
-  baseUrl: 'http://gc.moscales.com'
+  baseUrl: 'https://gc.moscales.com'
 }
 
 function fetchPost(url, params = {}, method = 'POST', header = {}) {
