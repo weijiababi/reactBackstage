@@ -271,7 +271,7 @@ export class Saleman extends Component {
           visible={this.state.commercesVisible}
           onOk={this.hideCommerces}
           onCancel={this.hideCommerces}
-          width={600}
+          width={700}
           destroyOnClose={true}
         >
           <MyTable
@@ -287,7 +287,7 @@ export class Saleman extends Component {
           visible={this.state.partnerVisible}
           onOk={this.hidePartner}
           onCancel={this.hidePartner}
-          width={600}
+          width={700}
           destroyOnClose={true}
         >
           <MyTable

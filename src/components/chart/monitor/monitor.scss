@@ -1,0 +1,25 @@
+.dataItem {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  .dataTitle {
+    font-size: 14px;
+    color: rgba(100, 100, 100, 0.9);
+  }
+  .dataContent {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: baseline;
+    .dataValue {
+      margin-right: 2px;
+      font-size: 18px;
+      color: rgba(20, 20, 20, 0.9);
+    }
+    .dataUnit {
+      font-size: 14px;
+      color: rgba(100, 100, 100, 0.9);
+    }
+  }
+}

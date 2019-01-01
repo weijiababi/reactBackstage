@@ -10,6 +10,7 @@ import Admin from '../Admin/Admin'
 import Line from '../chart/line/line'
 import Bar from '../chart/bar/bar'
 import Pie from '../chart/pie/pie'
+import Monitor from '../chart/monitor/monitor'
 import './Home.scss'
 const { Header, Sider, Content } = Layout
 export class Home extends Component {
@@ -60,7 +61,8 @@ export class Home extends Component {
         children: [
           { name: 'line', link: '/home/chart/line' },
           { name: 'bar', link: '/home/chart/bar' },
-          { name: 'pie', link: '/home/chart/pie' }
+          { name: 'pie', link: '/home/chart/pie' },
+          { name: 'monitor', link: '/home/chart/monitor' }
         ]
       }
     ]
@@ -187,6 +189,7 @@ export class Home extends Component {
           </Header>
           <Content
             style={{
+              position: 'relative',
               margin: '24px 16px',
               padding: 24,
               background: '#fff',
@@ -207,6 +210,7 @@ export class Home extends Component {
               <Route path="/home/chart/line" exact component={Line} />
               <Route path="/home/chart/bar" exact component={Bar} />
               <Route path="/home/chart/pie" exact component={Pie} />
+              <Route path="/home/chart/monitor" exact component={Monitor} />
               <Redirect exact from="/home" to="/home/user" />
             </Switch>
           </Content>

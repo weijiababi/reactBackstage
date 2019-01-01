@@ -155,12 +155,12 @@ export class MyTable extends Component {
     })
   }
 
-  update = (key, index, msg = '修改成功', url = '') => {
-    $post(url, key).then(res => {
+  update = (param, index, msg = '修改成功', url = '') => {
+    $post(url, param).then(res => {
       console.log(res)
       if (res.code === 200) {
         let dataSource = this.state.dataSource.map((item, order) => {
-          return order === index ? Object.assign(item, key) : item
+          return order === index ? Object.assign(item, param) : item
         })
         this.setState({
           dataSource

@@ -31,14 +31,14 @@ export class ArticlePublish extends Component {
     this.editor = editor
     editor.customConfig.zIndex = 100
     editor.customConfig.uploadImgServer =
-      'http://gc.moscales.com/backend/article/upload'
+      'https://gc.moscales.com/backend/article/upload'
     editor.customConfig.uploadImgMaxLength = 1
     editor.customConfig.customUploadImg = (files, insert) => {
       if (files[0]) {
         const formData = new window.FormData()
         formData.append('files', files[0], 'cover.jpg') //分别为表单名称，表单值以及文件名
         formData.append('session_id', Cookie.get('session'))
-        fetch('http://gc.moscales.com/backend/article/upload', {
+        fetch('https://gc.moscales.com/backend/article/upload', {
           method: 'POST',
           body: formData
         })

@@ -87,6 +87,8 @@ export class User extends Component {
     this.user = {}
   }
 
+  componentDidMount() {}
+
   render() {
     const { money } = this.state
     const suffix =
@@ -121,12 +123,12 @@ export class User extends Component {
   }
 
   changeStatus = (params, index) => {
-    let status = params.status === 1 ? 2 : 1
-    let { user_id } = params
-    let key = { status, user_id }
+    let status = params.status === 1 ? 2 : 1 //计算下一个状态
+    let { user_id } = params //获取user_id的值
+    let param = { status, user_id } //构造参数对象
     let msg = params.status === 1 ? '拉黑成功' : '解禁成功'
     let url = '/backend/user/status'
-    this.refs.myTable.update(key, index, msg, url)
+    this.refs.myTable.update(param, index, msg, url)
   }
 
   setAdmin = (text, params, index) => {
