@@ -5,7 +5,9 @@ import './monitor.scss'
 export class monitor extends Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      loading: true
+    }
     this.cardList = [
       {
         title: '今日交易总额',
@@ -30,12 +32,21 @@ export class monitor extends Component {
     ]
   }
 
+  componentDidMount() {
+    this.timeout(10)
+  }
+
   render() {
+    const { loading } = this.state
     return (
       <div className="monitor">
         <Row gutter={24}>
           <Col xl={18} lg={24} md={24} sm={24} xs={24}>
-            <Card title="活动实时交易情况" style={{ height: '600px' }}>
+            <Card
+              title="活动实时交易情况"
+              style={{ marginBottom: '24px', height: '600px' }}
+              loading={loading}
+            >
               <Row>
                 {this.cardList.map(item => {
                   return (
@@ -59,8 +70,8 @@ export class monitor extends Component {
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
             <Card
               title="活动情况预测"
-              style={{ height: '288px' }}
-              loading={true}
+              style={{ marginBottom: '24px', height: '288px' }}
+              loading={loading}
             >
               {/**
                 实时数据图
@@ -75,12 +86,12 @@ export class monitor extends Component {
             </Card>
             <Card
               title="券核效率"
-              style={{ marginTop: '24px', height: '288px' }}
+              style={{ marginBottom: '24px', height: '288px' }}
             >
               {/**
                 加速计图
               */}
-              <Skeleton loading={true} avatar active>
+              <Skeleton loading={loading} avatar active>
                 <Card.Meta
                   title="card title"
                   description="This is the description"
@@ -94,6 +105,21 @@ export class monitor extends Component {
         </Row>
       </div>
     )
+  }
+
+  async timeout(range) {
+    let promise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(1)
+      }, Math.random() * range * 1000)
+    })
+    let result = await promise
+
+    if (result === 1) {
+      this.setState({
+        loading: false
+      })
+    }
   }
 }
 
