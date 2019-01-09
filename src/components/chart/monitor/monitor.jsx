@@ -34,26 +34,6 @@ export class monitor extends Component {
 
   componentDidMount() {
     this.timeout(10)
-    fetch('http://localhost:8888/resetUser', {
-      method: 'POST',
-      body: JSON.stringify({
-        id: 4,
-        name: '肥仔涛',
-        password: '666666',
-        phone: '13500012458'
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(res => {
-        if (res.status === 200) {
-          return res.json()
-        }
-      })
-      .then(res => {
-        console.log(res)
-      })
   }
 
   render() {
